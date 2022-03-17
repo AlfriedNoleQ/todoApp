@@ -30,6 +30,7 @@ const TodoLists = () => {
                 type="checkbox" 
                 onClick={() => handleToggleAllTodo()}
                 checked={isCheckedAll}
+                readOnly
             />
             <label htmlFor="toggle-all">Mark all as complete</label>
             <ul className="todo-list">

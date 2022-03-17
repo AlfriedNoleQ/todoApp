@@ -31,24 +31,16 @@ export const deleteTodo = createAsyncThunk(
 		return todoId
     })
 
-export const editTodo = createAsyncThunk(
-    'todos/editTodo', 
-    async (id, title) => {
-        const updateTodo = {
-            id,
-            title
-        }
+// export const editTodo = createAsyncThunk(
+//     'todos/editTodo', 
+//     async (todoId, title) => {
+//         await todosApi.put(`/todos/${todoId}`, title)
     
-        await todosApi.post('/todos', updateTodo)
-    
-        return updateTodo
-    })
+//         return title
+//     })
 
 const initialState = {
     todoList: [],
-    // todoList: localStorage.getItem('todos') 
-    // ? JSON.parse(localStorage.getItem('todos'))
-    // : [],
     todoEditingId: '',
     isCheckedAll: false,
     status: 'ALL',
@@ -59,41 +51,29 @@ const todosSlice = createSlice({
     name: 'todos',
     initialState,
     reducers: {
-        // addTodo: (state, action) => {
-        //     const newTodo = action.payload
-        //     state.todoList.push(newTodo)
-        //     toast.success('ADD NEW TODO SUCCESS!')
-        //     // localStorage.setItem('todos', JSON.stringify(state.todoList))
-        // },
         toggleTodo: (state, action) => {
-            const todoId = action.payload
+            const id = action.payload
             state.todoList = state.todoList.map(todo => {
-                if(todo.id === todoId) todo.isCompleted = !todo.isCompleted
+                if(todo.id === id) todo.isCompleted = !todo.isCompleted
                 return todo
             })
             state.isCheckedAll = !isNotCheckedAll(state.todoList)
-            toast.info(`TOGGLE TODO ${todoId}`)
+            toast.info(`TOGGLE TODO ${id}`)
             // localStorage.setItem('todos', JSON.stringify(state.todoList))
         },
-        // deleteTodo: (state, action) => {
-        //     const todoId = action.payload
-        //     state.todoList = state.todoList.filter(todo => todo.id !== todoId)
-        //     toast.error(`TODO ${todoId} IS REMOVING!`)
-        //     // localStorage.setItem('todos', JSON.stringify(state.todoList))
-        // },
         getTodoId: (state, action) => {
             state.todoEditingId = action.payload
         },
-        // editTodo: (state, action) => {
-        //     const todoId = action.payload.id
-        //     state.todoList = state.todoList.map(todo => {
-        //         if(todo.id === todoId) todo.title = action.payload.title
-        //         return todo
-        //     })
-        //     state.todoEditingId = ''
-        //     toast.success('UPDATE TODO SUCCESS!')
-        //     // localStorage.setItem('todos', JSON.stringify(state.todoList))
-        // },
+        editTodo: (state, action) => {
+            const todoId = action.payload.id
+            state.todoList = state.todoList.map(todo => {
+                if(todo.id === todoId) todo.title = action.payload.title
+                return todo
+            })
+            state.todoEditingId = ''
+            toast.success('UPDATE TODO SUCCESS!')
+            // localStorage.setItem('todos', JSON.stringify(state.todoList))
+        },
         checkedAllTodo: (state, action) => {
             state.todoList = state.todoList.map(todo => {
                 todo.isCompleted = !state.isCheckedAll
@@ -145,27 +125,18 @@ const todosSlice = createSlice({
             toast.error(`TODO IS REMOVING!`)
         },
         // Update Todo
-        [editTodo.pending]: () => {
-            console.log('Updating...')
-        },
-        [editTodo.fulfilled]: (state, action) => {
-            const updateTodo = state.todoList.map(todo => {
-                if(todo.id === action.payload.id) {
-                    return {
-                        ...todo,
-                        title: action.payload.title,
-                    }
-                }
-                return todo
-            })
-            state.todoList = updateTodo
-            // state.todoList = state.todoList.map(todo => {
-            //     if(todo.id === action.payload.id) todo.title = action.payload.title
-            //     return todo
-            // })
-            state.todoEditingId = ''
-            toast.success('UPDATE TODO SUCCESS!')
-        }
+        // [editTodo.pending]: () => {
+        //     console.log('Updating...')
+        // },
+        // [editTodo.fulfilled]: (state, action) => {
+        //     const { id, title } = action.payload
+        //     state.todoList = state.todoList.map(todo => {
+        //         if(todo.id === id) todo.title = title
+        //         return todo
+        //     })
+        //     state.todoEditingId = ''
+        //     toast.success('UPDATE TODO SUCCESS!')
+        // }
     }
 })
 
@@ -174,7 +145,7 @@ export const {
     toggleTodo, 
     // deleteTodo,
     getTodoId,
-    // editTodo, 
+    editTodo, 
     checkedAllTodo,
     setStatusFilter,
     clearCompleteTodo
