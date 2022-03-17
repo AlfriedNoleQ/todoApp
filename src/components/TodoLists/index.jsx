@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Todo from "../Todo";
+import Loading from "../Loading"
 import { useSelector, useDispatch } from "react-redux";
-import { checkedAllTodo } from '../../features/todosSlice'
+import { checkedAllTodo, fetchAsyncTodos } from '../../features/todosSlice'
 import {filterByStatus} from '../../helper/todosHelper'
 
 const TodoLists = () => {
@@ -9,12 +10,17 @@ const TodoLists = () => {
     const status = useSelector((state) => state.todos.status)
     const newTodoList = filterByStatus(todoList, status)
     const isCheckedAll = useSelector((state) => state.todos.isCheckedAll)
+    const loading = useSelector((state) => state.todos.pending)
 
     const dispatch = useDispatch()
 
     const handleToggleAllTodo = () => {
         dispatch(checkedAllTodo())
     }
+
+    useEffect(() => {
+        dispatch(fetchAsyncTodos())
+    }, [dispatch])
 
     return (
         <section className="main">
@@ -27,15 +33,27 @@ const TodoLists = () => {
             />
             <label htmlFor="toggle-all">Mark all as complete</label>
             <ul className="todo-list">
-                {newTodoList && newTodoList.length > 0 && newTodoList.map(todo => (
-                        <Todo 
-                            key={todo.id}
-                            title={todo.title}
-                            id={todo.id}
-                            isCompleted={todo.isCompleted}
-                        />
+                {
+                    loading === 'success' ? (
+                            <>
+                                {newTodoList && newTodoList.length > 0 && newTodoList?.map(todo => (
+                                        <Todo 
+                                            key={todo.id}
+                                            title={todo.title}
+                                            id={todo.id}
+                                            isCompleted={todo.isCompleted}
+                                        />
+                                    )
+                                )}
+                            </>
+                    ) : loading === 'pending' ? (
+                        <div style={{textAlign: 'center'}}>
+                            <Loading />
+                        </div>
+                    ) : (
+                        <p>Unexpected error occured...</p>
                     )
-                )}
+                }
             </ul>
         </section>
     );

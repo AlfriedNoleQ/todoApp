@@ -13,25 +13,8 @@ const Header = () => {
     }
 
     const handleAddTodo = (e) => {
-        // return new Promise(resolve => {
-        //     setTimeout(() => {
-        //         if (e.which === '13' && title) {
-        //             dispatch(addTodo({
-        //                 id: new Date().valueOf(),
-        //                 title,
-        //                 isCompleted: false
-        //             }))
-        //             setTitle('')
-        //         }
-        //         resolve(true)
-        //     }, 1000)
-        // })
         if (e.key === 'Enter' && title) {
-            dispatch(addTodo({
-                id: new Date().valueOf(),
-                title,
-                isCompleted: false
-            }))
+            dispatch(addTodo(title))
             setTitle('')
         }
     }
