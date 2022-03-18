@@ -37,9 +37,9 @@ const TodoLists = () => {
                 {
                     loading === 'success' ? (
                             <>
-                                {newTodoList && newTodoList.length > 0 && newTodoList?.map(todo => (
+                                {newTodoList && newTodoList.length > 0 && newTodoList?.map((todo, index) => (
                                         <Todo 
-                                            key={todo.id}
+                                            key={index}
                                             title={todo.title}
                                             id={todo.id}
                                             isCompleted={todo.isCompleted}
@@ -52,7 +52,7 @@ const TodoLists = () => {
                             <Loading />
                         </div>
                     ) : (
-                        <p>Unexpected error occured...</p>
+                        <p style={{textAlign: 'center'}}>Something wrong...</p>
                     )
                 }
             </ul>

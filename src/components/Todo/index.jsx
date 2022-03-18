@@ -7,7 +7,7 @@ const Todo = (props) => {
     const editingId = useSelector((state) => state.todos.todoEditingId)
     const isEditing = editingId === id
     const [text, setText] = useState(title);
-
+    
     const dispatch = useDispatch()
 
     const handleToggleTodo = id => {
@@ -20,11 +20,12 @@ const Todo = (props) => {
 
     const getTodoEditingId = id => {
         dispatch(getTodoId(id))
+        console.log(id)
     }
 
     const handleEditTodo = (e) => {
         if (e.key === 'Enter' && text) {
-            dispatch(editTodo(text))
+            dispatch(editTodo(editingId, text))
         }
     }
 
@@ -58,7 +59,7 @@ const Todo = (props) => {
                         className="edit"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        onBlur={() => dispatch(editTodo(text))}
+                        onBlur={() => dispatch(editTodo(editingId, text))}
                         onKeyPress={handleEditTodo}
                         autoFocus
                     />

@@ -6,7 +6,8 @@ import todosApi from '../common/api/todosApi'
 export const fetchAsyncTodos = createAsyncThunk(
     "todos/fetchAsyncTodos", 
     async () => {
-        const response = await todosApi.get(`/todos`)
+        const limit = 5
+        const response = await todosApi.get(`/todos?_limit=${5}`)
         return response.data
     })
 
@@ -18,9 +19,7 @@ export const addTodo = createAsyncThunk(
             title,
             isCompleted: false
         }
-    
         await todosApi.post('/todos', newTodo)
-    
         return newTodo
     })
 
@@ -34,9 +33,9 @@ export const deleteTodo = createAsyncThunk(
 // export const editTodo = createAsyncThunk(
 //     'todos/editTodo', 
 //     async (todoId, title) => {
-//         await todosApi.put(`/todos/${todoId}`, title)
-    
-//         return title
+//         const path = `/todos/${todoId}`
+//         const response = await todosApi.put(path, title)
+//         return response.data
 //     })
 
 const initialState = {
@@ -134,6 +133,10 @@ const todosSlice = createSlice({
         //         if(todo.id === id) todo.title = title
         //         return todo
         //     })
+        //     const todoId = state.todoList.findIndex(todo => todo.id === id)
+        //     if(todoId >= 0) {
+        //         state.todoList[todoId] = title
+        //     }
         //     state.todoEditingId = ''
         //     toast.success('UPDATE TODO SUCCESS!')
         // }
