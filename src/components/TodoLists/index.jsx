@@ -10,7 +10,7 @@ const TodoLists = () => {
     const status = useSelector((state) => state.todos.status)
     const newTodoList = filterByStatus(todoList, status)
     const isCheckedAll = useSelector((state) => state.todos.isCheckedAll)
-    const loading = useSelector((state) => state.todos.pending)
+    const fetchLoading = useSelector((state) => state.todos.fetchDataPending)
 
     const dispatch = useDispatch()
 
@@ -35,7 +35,7 @@ const TodoLists = () => {
             <label htmlFor="toggle-all">Mark all as complete</label>
             <ul className="todo-list">
                 {
-                    loading === 'success' ? (
+                    fetchLoading === 'success' ? (
                             <>
                                 {newTodoList && newTodoList.length > 0 && newTodoList?.map((todo, index) => (
                                         <Todo 
@@ -47,7 +47,7 @@ const TodoLists = () => {
                                     )
                                 )}
                             </>
-                    ) : loading === 'pending' ? (
+                    ) : fetchLoading === 'pending' ? (
                         <div style={{textAlign: 'center'}}>
                             <Loading />
                         </div>

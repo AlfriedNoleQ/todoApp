@@ -1,10 +1,12 @@
 import React from 'react'
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addTodo } from '../../features/todosSlice'
+import Loading from '../Loading'
 
 const Header = () => {
     const [title, setTitle] = useState('')
+    const addLoading = useSelector((state) => state.todos.addDataPending)
 
     const dispatch = useDispatch()
 
@@ -21,7 +23,7 @@ const Header = () => {
 
     return (
         <>
-            <header className="header">
+            <header className="header" style={{position: 'relative'}}>
                 <h1>todos</h1>
                 <input 
                     className="new-todo" 
@@ -29,8 +31,16 @@ const Header = () => {
                     onChange={changeTitle}
                     onKeyPress={handleAddTodo}
                     value={title}
+                    disabled={addLoading === 'pending'}
                     autoFocus
                 />
+                {
+                    addLoading === 'pending' ? (
+                        <div className="add-data-pending">
+                            <Loading />
+                        </div>
+                    ) : (<></>)
+                }
             </header>
         </>
   )

@@ -6,8 +6,7 @@ import todosApi from '../common/api/todosApi'
 export const fetchAsyncTodos = createAsyncThunk(
     "todos/fetchAsyncTodos", 
     async () => {
-        const limit = 5
-        const response = await todosApi.get(`/todos?_limit=${5}`)
+        const response = await todosApi.get(`/todos`)
         return response.data
     })
 
@@ -30,20 +29,21 @@ export const deleteTodo = createAsyncThunk(
 		return todoId
     })
 
-// export const editTodo = createAsyncThunk(
-//     'todos/editTodo', 
-//     async (todoId, title) => {
-//         const path = `/todos/${todoId}`
-//         const response = await todosApi.put(path, title)
-//         return response.data
-//     })
+export const editTodo = createAsyncThunk(
+    'todos/editTodo', 
+    async (todoId, data) => {
+        const path = `/todos/${todoId}`
+        const response = await todosApi.put(path, data)
+        return response.data
+    })
 
 const initialState = {
     todoList: [],
     todoEditingId: '',
     isCheckedAll: false,
     status: 'ALL',
-    pending: null
+    fetchDataPending: null,
+    addDataPending: null
 }
 
 const todosSlice = createSlice({
@@ -58,20 +58,9 @@ const todosSlice = createSlice({
             })
             state.isCheckedAll = !isNotCheckedAll(state.todoList)
             toast.info(`TOGGLE TODO ${id}`)
-            // localStorage.setItem('todos', JSON.stringify(state.todoList))
         },
         getTodoId: (state, action) => {
             state.todoEditingId = action.payload
-        },
-        editTodo: (state, action) => {
-            const todoId = action.payload.id
-            state.todoList = state.todoList.map(todo => {
-                if(todo.id === todoId) todo.title = action.payload.title
-                return todo
-            })
-            state.todoEditingId = ''
-            toast.success('UPDATE TODO SUCCESS!')
-            // localStorage.setItem('todos', JSON.stringify(state.todoList))
         },
         checkedAllTodo: (state, action) => {
             state.todoList = state.todoList.map(todo => {
@@ -87,30 +76,31 @@ const todosSlice = createSlice({
         clearCompleteTodo: (state, action) => {
             state.todoList = filterByStatus(state.todoList, 'ACTIVE')
             toast.error(`ALL COMPLETED TODO IS REMOVING!`)
-            // localStorage.setItem('todos', JSON.stringify(state.todoList))
         }
     },
     extraReducers: {
         // Fetch data
         [fetchAsyncTodos.pending]: (state, action) => {
             console.log("Fetch Data Pending...");
-            state.pending = 'pending'
+            state.fetchDataPending = 'pending'
         },
         [fetchAsyncTodos.fulfilled]: (state, action) => {
             console.log("Fetched Successfully!");
-            state.pending = 'success'
+            state.fetchDataPending = 'success'
             state.todoList = action.payload
             toast.success("FETCHED SUCCESS!")
         },
         [fetchAsyncTodos.rejected]: (state, action) => {
-            state.pending = 'rejected'
+            state.fetchDataPending = 'rejected'
             toast.error("FETCHED ERROR!")
         },
         // Add todo
-        [addTodo.pending]: () => {
+        [addTodo.pending]: (state) => {
             console.log("Add Todo Pending...");
+            state.addDataPending = 'pending'
         },
         [addTodo.fulfilled]: (state, action) => {
+            state.addDataPending = 'success'
             state.todoList.push(action.payload)
             toast.success('ADD NEW TODO SUCCESS!')
         },
@@ -124,22 +114,22 @@ const todosSlice = createSlice({
             toast.error(`TODO IS REMOVING!`)
         },
         // Update Todo
-        // [editTodo.pending]: () => {
-        //     console.log('Updating...')
-        // },
-        // [editTodo.fulfilled]: (state, action) => {
-        //     const { id, title } = action.payload
-        //     state.todoList = state.todoList.map(todo => {
-        //         if(todo.id === id) todo.title = title
-        //         return todo
-        //     })
-        //     const todoId = state.todoList.findIndex(todo => todo.id === id)
-        //     if(todoId >= 0) {
-        //         state.todoList[todoId] = title
-        //     }
-        //     state.todoEditingId = ''
-        //     toast.success('UPDATE TODO SUCCESS!')
-        // }
+        [editTodo.pending]: () => {
+            console.log('Updating...')
+        },
+        [editTodo.fulfilled]: (state, action) => {
+            const { id, title } = action.payload
+            state.todoList = state.todoList.map(todo => {
+                if(todo.id === id) todo.title = title
+                return todo
+            })
+            // const todoId = state.todoList.findIndex(todo => todo.id === id)
+            // if(todoId >= 0) {
+            //     state.todoList[todoId].title = title
+            // }
+            state.todoEditingId = ''
+            toast.success('UPDATE TODO SUCCESS!')
+        }
     }
 })
 
@@ -148,7 +138,7 @@ export const {
     toggleTodo, 
     // deleteTodo,
     getTodoId,
-    editTodo, 
+    // editTodo, 
     checkedAllTodo,
     setStatusFilter,
     clearCompleteTodo

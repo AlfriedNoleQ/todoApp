@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com/",
+  baseURL: "https://62315f6305f5f4d40d78e17a.mockapi.io/",
 });

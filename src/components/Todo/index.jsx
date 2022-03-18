@@ -23,9 +23,16 @@ const Todo = (props) => {
         console.log(id)
     }
 
+    const newTodo = {
+        id,
+        title: text,
+        isCompleted
+    }
+
     const handleEditTodo = (e) => {
         if (e.key === 'Enter' && text) {
-            dispatch(editTodo(editingId, text))
+            console.log(newTodo)
+            dispatch(editTodo(id, newTodo))
         }
     }
 
@@ -59,7 +66,6 @@ const Todo = (props) => {
                         className="edit"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        onBlur={() => dispatch(editTodo(editingId, text))}
                         onKeyPress={handleEditTodo}
                         autoFocus
                     />
