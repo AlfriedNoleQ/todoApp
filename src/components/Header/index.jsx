@@ -7,6 +7,7 @@ import Loading from '../Loading'
 const Header = () => {
     const [title, setTitle] = useState('')
     const addLoading = useSelector((state) => state.todos.addDataPending)
+    const todoAmount = useSelector((state) => state.todos.todoList.length)
 
     const dispatch = useDispatch()
 
@@ -14,9 +15,15 @@ const Header = () => {
         setTitle(e.target.value)
     }
 
+    const newTodo = {
+        id: todoAmount + 1,
+        title,
+        isCompleted: false
+    }
+
     const handleAddTodo = (e) => {
         if (e.key === 'Enter' && title) {
-            dispatch(addTodo(title))
+            dispatch(addTodo(newTodo))
             setTitle('')
         }
     }

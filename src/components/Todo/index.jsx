@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { toggleTodo, deleteTodo, editTodo, getTodoId } from '../../features/todosSlice'
+import { toggleTodo, deleteTodo, editTodo, getTodoId, cancelEditing } from '../../features/todosSlice'
 
 const Todo = (props) => {
     const { isCompleted, title, id } = props
@@ -20,7 +20,7 @@ const Todo = (props) => {
 
     const getTodoEditingId = id => {
         dispatch(getTodoId(id))
-        console.log(id)
+        console.log('CurrentTodoId:', id)
     }
 
     const newTodo = {
@@ -28,10 +28,11 @@ const Todo = (props) => {
         title: text,
         isCompleted
     }
+    // console.log(newTodo)
 
     const handleEditTodo = (e) => {
         if (e.key === 'Enter' && text) {
-            console.log(newTodo)
+            console.log('Component Data Update: ', newTodo)
             dispatch(editTodo(id, newTodo))
         }
     }
@@ -67,6 +68,7 @@ const Todo = (props) => {
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         onKeyPress={handleEditTodo}
+                        onBlur={() => dispatch(cancelEditing())}
                         autoFocus
                     />
                 }

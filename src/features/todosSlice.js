@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { isNotCheckedAll, filterByStatus } from "../helper/todosHelper"
 import { toast } from 'react-toastify'
 import todosApi from '../common/api/todosApi'
@@ -12,14 +12,10 @@ export const fetchAsyncTodos = createAsyncThunk(
 
 export const addTodo = createAsyncThunk(
     'todos/addTodo', 
-    async title => {
-        const newTodo = {
-            id: nanoid(),
-            title,
-            isCompleted: false
-        }
-        await todosApi.post('/todos', newTodo)
-        return newTodo
+    async data => {
+        console.log('add todo data: ', data)
+        await todosApi.post('/todos', data)
+        return data
     })
 
 export const deleteTodo = createAsyncThunk(
@@ -34,6 +30,7 @@ export const editTodo = createAsyncThunk(
     async (todoId, data) => {
         const path = `/todos/${todoId}`
         const response = await todosApi.put(path, data)
+        console.log('createAsyncThunk response:', response.data)
         return response.data
     })
 
@@ -61,6 +58,9 @@ const todosSlice = createSlice({
         },
         getTodoId: (state, action) => {
             state.todoEditingId = action.payload
+        },
+        cancelEditing: (state, action) => {
+            state.todoEditingId = ''
         },
         checkedAllTodo: (state, action) => {
             state.todoList = state.todoList.map(todo => {
@@ -115,12 +115,12 @@ const todosSlice = createSlice({
         },
         // Update Todo
         [editTodo.pending]: () => {
-            console.log('Updating...')
+            console.log('editTodo.pending: Updating...')
         },
         [editTodo.fulfilled]: (state, action) => {
-            const { id, title } = action.payload
+            console.log('extraReducers action payload: ', action.payload)
             state.todoList = state.todoList.map(todo => {
-                if(todo.id === id) todo.title = title
+                if(todo.id === action.payload.id) todo.title = action.payload.title
                 return todo
             })
             // const todoId = state.todoList.findIndex(todo => todo.id === id)
@@ -139,6 +139,7 @@ export const {
     // deleteTodo,
     getTodoId,
     // editTodo, 
+    cancelEditing, 
     checkedAllTodo,
     setStatusFilter,
     clearCompleteTodo
