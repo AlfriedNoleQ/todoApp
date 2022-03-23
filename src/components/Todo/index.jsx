@@ -16,24 +16,29 @@ const Todo = (props) => {
 
     const handleDeleteTodo = id => {
         dispatch(deleteTodo(id))
+        .then((response) => {
+            console.log(response)
+        })
+        console.log(id)
     }
 
     const getTodoEditingId = id => {
         dispatch(getTodoId(id))
         console.log('CurrentTodoId:', id)
     }
-
-    const newTodo = {
-        id,
-        title: text,
-        isCompleted
-    }
-    // console.log(newTodo)
-
+    
     const handleEditTodo = (e) => {
+        const newTodo = {
+            id: editingId,
+            title: text,
+            isCompleted
+        }
+        console.log(newTodo)
         if (e.key === 'Enter' && text) {
-            console.log('Component Data Update: ', newTodo)
-            dispatch(editTodo(id, newTodo))
+            dispatch(editTodo({ id, ...newTodo }))
+                .then((response) => {
+                    console.log('update data: ', response)
+                })
         }
     }
 

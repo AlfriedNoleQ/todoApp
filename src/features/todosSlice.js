@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { isNotCheckedAll, filterByStatus } from "../helper/todosHelper"
 import { toast } from 'react-toastify'
-import todosApi from '../common/api/todosApi'
+import todosServer from '../common/api/todosApi'
 
 export const fetchAsyncTodos = createAsyncThunk(
     "todos/fetchAsyncTodos", 
     async () => {
-        const response = await todosApi.get(`/todos`)
+        const response = await todosServer.getAll()
         return response.data
     })
 
@@ -14,22 +14,21 @@ export const addTodo = createAsyncThunk(
     'todos/addTodo', 
     async data => {
         console.log('add todo data: ', data)
-        await todosApi.post('/todos', data)
+        await todosServer.create(data)
         return data
     })
 
 export const deleteTodo = createAsyncThunk(
     'todos/deleteTodo', 
     async todoId => {
-        await todosApi.delete(`/todos/${todoId}`)
+        await todosServer.remove(todoId)
 		return todoId
     })
 
 export const editTodo = createAsyncThunk(
     'todos/editTodo', 
-    async (todoId, data) => {
-        const path = `/todos/${todoId}`
-        const response = await todosApi.put(path, data)
+    async ({ todoId, data }) => {
+        const response = await todosServer.update(todoId, data)
         console.log('createAsyncThunk response:', response.data)
         return response.data
     })
@@ -61,7 +60,17 @@ const todosSlice = createSlice({
         },
         cancelEditing: (state, action) => {
             state.todoEditingId = ''
+            toast.info('CANCEL EDITING!')
         },
+        // editTodo: (state, action) => {
+        //     const todoId = state.todoList.findIndex(todo => todo.id === action.payload.id)
+        //     if(todoId >= 0) {
+        //         state.todoList[todoId].title = action.payload.title
+        //     }
+        //     console.log('extraReducers action payload: ', action.payload.title)
+        //     state.todoEditingId = ''
+        //     toast.success('UPDATE TODO SUCCESS!')
+        // },
         checkedAllTodo: (state, action) => {
             state.todoList = state.todoList.map(todo => {
                 todo.isCompleted = !state.isCheckedAll
@@ -118,17 +127,25 @@ const todosSlice = createSlice({
             console.log('editTodo.pending: Updating...')
         },
         [editTodo.fulfilled]: (state, action) => {
-            console.log('extraReducers action payload: ', action.payload)
+            // const todoId = state.todoList.findIndex(todo => todo.id === action.payload.id)
+            // if(todoId >= 0) {
+            //     state.todoList[todoId].title = action.payload.title
+            // }
+            const todoId = action.payload.id
             state.todoList = state.todoList.map(todo => {
-                if(todo.id === action.payload.id) todo.title = action.payload.title
+                if(todo.id === todoId) todo.title = action.payload.title
                 return todo
             })
-            // const todoId = state.todoList.findIndex(todo => todo.id === id)
-            // if(todoId >= 0) {
-            //     state.todoList[todoId].title = title
-            // }
             state.todoEditingId = ''
             toast.success('UPDATE TODO SUCCESS!')
+            console.log('extraReducers action payload: ', action.payload.title)
+            state.todoEditingId = ''
+            toast.success('UPDATE TODO SUCCESS!')
+        },
+        [editTodo.rejected]: (state, action) => {
+            console.log('editTodo.rejected: Updating fail...')
+            state.todoEditingId = ''
+            toast.error(`UPDATE FAIL!`)
         }
     }
 })
@@ -138,7 +155,7 @@ export const {
     toggleTodo, 
     // deleteTodo,
     getTodoId,
-    // editTodo, 
+    //editTodo, 
     cancelEditing, 
     checkedAllTodo,
     setStatusFilter,
