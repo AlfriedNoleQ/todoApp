@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { toggleTodo, deleteTodo, editTodo, getTodoId } from '../../features/todosSlice'
+import { toggleTodo, deleteTodo, editTodo, getTodoId, cancelEditing } from '../../features/todosSlice'
 
 const Todo = (props) => {
     const { isCompleted, title, id } = props
     const editingId = useSelector((state) => state.todos.todoEditingId)
     const isEditing = editingId === id
     const [text, setText] = useState(title);
-
+    
     const dispatch = useDispatch()
 
     const handleToggleTodo = id => {
@@ -16,20 +16,29 @@ const Todo = (props) => {
 
     const handleDeleteTodo = id => {
         dispatch(deleteTodo(id))
+        .then((response) => {
+            console.log(response)
+        })
+        console.log(id)
     }
 
     const getTodoEditingId = id => {
         dispatch(getTodoId(id))
+        console.log('CurrentTodoId:', id)
     }
-    const newTodo = {
-        id,
-        title: text,
-        isCompleted
-    }
-
+    
     const handleEditTodo = (e) => {
+        const newTodo = {
+            id: editingId,
+            title: text,
+            isCompleted
+        }
+        console.log(newTodo)
         if (e.key === 'Enter' && text) {
-            dispatch(editTodo(newTodo))
+            dispatch(editTodo({ id, ...newTodo }))
+                .then((response) => {
+                    console.log('update data: ', response)
+                })
         }
     }
 
@@ -63,8 +72,8 @@ const Todo = (props) => {
                         className="edit"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        onBlur={() => dispatch(editTodo(newTodo))}
                         onKeyPress={handleEditTodo}
+                        onBlur={() => dispatch(cancelEditing())}
                         autoFocus
                     />
                 }

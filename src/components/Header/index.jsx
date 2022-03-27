@@ -1,10 +1,13 @@
 import React from 'react'
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addTodo } from '../../features/todosSlice'
+import Loading from '../Loading'
 
 const Header = () => {
     const [title, setTitle] = useState('')
+    const addLoading = useSelector((state) => state.todos.addDataPending)
+    const todoAmount = useSelector((state) => state.todos.todoList.length)
 
     const dispatch = useDispatch()
 
@@ -12,33 +15,22 @@ const Header = () => {
         setTitle(e.target.value)
     }
 
+    const newTodo = {
+        id: todoAmount + 1,
+        title,
+        isCompleted: false
+    }
+
     const handleAddTodo = (e) => {
-        // return new Promise(resolve => {
-        //     setTimeout(() => {
-        //         if (e.which === '13' && title) {
-        //             dispatch(addTodo({
-        //                 id: new Date().valueOf(),
-        //                 title,
-        //                 isCompleted: false
-        //             }))
-        //             setTitle('')
-        //         }
-        //         resolve(true)
-        //     }, 1000)
-        // })
         if (e.key === 'Enter' && title) {
-            dispatch(addTodo({
-                id: new Date().valueOf(),
-                title,
-                isCompleted: false
-            }))
+            dispatch(addTodo(newTodo))
             setTitle('')
         }
     }
 
     return (
         <>
-            <header className="header">
+            <header className="header" style={{position: 'relative'}}>
                 <h1>todos</h1>
                 <input 
                     className="new-todo" 
@@ -46,8 +38,16 @@ const Header = () => {
                     onChange={changeTitle}
                     onKeyPress={handleAddTodo}
                     value={title}
+                    disabled={addLoading === 'pending'}
                     autoFocus
                 />
+                {
+                    addLoading === 'pending' ? (
+                        <div className="add-data-pending">
+                            <Loading />
+                        </div>
+                    ) : (<></>)
+                }
             </header>
         </>
   )
